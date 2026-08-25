@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cardiorenal-syndrome-engine"
+version = "2.0.0"
+description = "CardioRenal Sentinel: Types 1-5 Cardiorenal & Reno-Cardiac Cross-Talk Arbiter"
+readme = "README.md"
+authors = [{ name = "Dr. Abu Suraih Sakhri", email = "abusuraih@example.com" }]
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+cardiorenal-syndrome-engine = "cardiorenal_syndrome_agent.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/abusuraihsakhri/cardiorenal-syndrome-engine"
+Repository = "https://github.com/abusuraihsakhri/cardiorenal-syndrome-engine.git"
