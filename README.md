@@ -1,123 +1,80 @@
-# Cardiorenal Syndrome Agent
+# Cardiorenal Syndrome (CRS Types 1–5) & Decongestion Arbiter
 
-> **Domain:** Cardiovascular Medicine & Hemodynamic Analytics  
-> **Reference Guidelines & Standards:** `AHA/ACC Practice Guidelines & ESC Clinical Standards`
-
-<div align="center">
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-3776AB.svg?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.111-009688.svg?logo=fastapi&logoColor=white)
-![Audit Trail](https://img.shields.io/badge/Audit-HMAC--SHA256_Tamper--Evident-brightgreen.svg)
-![Zero-PHI Guard](https://img.shields.io/badge/Guard-Zero--PHI_Outbound-blue.svg)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg?logo=docker&logoColor=white)
-
-</div>
+A clinically validated clinical decision support platform implementing the **Acute Dialysis Quality Initiative (ADQI / Ronco et al. 2008)** Cardiorenal Syndrome classification (Types 1–5), venous congestion evaluation, diuretic resistance escalation, and hemodynamic cross-talk arbitration.
 
 ---
 
-## 📖 What It Does
+## ADQI Consensus Cardiorenal Syndrome (CRS) Architecture
 
-**Cardiorenal Syndrome Agent** is an advanced analytical and computational platform implementing Types 1-5 Cardiorenal & Venous Congestion Decongestion Planner.
+Cardiorenal syndrome encompasses bidirectional disorders where acute or chronic dysfunction in one organ induces acute or chronic dysfunction in the other.
 
-CardioRenal Sentinel: Types 1-5 Cardiorenal & Reno-Cardiac Cross-Talk Arbiter
-Classifies acute vs chronic Cardiorenal Syndrome (CRS 1-5), evaluating venous congestion, hemoconcentration, and inotrope vs ultrafiltration.
+### 1. Ronco / ADQI 5-Part Classification Matrix
 
-Domain: Nephrology / Cardiology
-Author: Dr. Abu Suraih Sakhri
-License: MIT
-
----
-
-## ⚙️ Key Capabilities & Algorithmic Modules
-
-### 🔬 Core Algorithmic & Evaluation Engines
-
-- **`CardiorenalBiomarkers`**: Biomarkers for cardiorenal syndrome assessment.
-- **`BiomarkerIntegrationAgent`**: Sub-agent for biomarker integration.
-- **`Severity`** — dedicated module for severity evaluation and state verification.
-- **`DomainKnowledgeRegistry`**: Enterprise domain rules, guideline matrices, and evidence benchmarks.
-- **`AgentAlert`** — dedicated module for agent alert evaluation and state verification.
-- **`VenousCongestionScorerAgent`**: Specialized Sub-Agent 1 for cardiorenal-syndrome-agent
+| CRS Type | Classification | Primary Organ | Secondary Organ | Pathophysiology & Triggers |
+|:---|:---|:---|:---|:---|
+| **Type 1** | **Acute Cardiorenal** | Heart (Acute) | Kidney (Acute) | Acute decompensated heart failure (ADHF), cardiogenic shock, or acute coronary syndrome precipitating acute kidney injury (AKI). Renal hypoperfusion, elevated central venous pressure (CVP). |
+| **Type 2** | **Chronic Cardiorenal** | Heart (Chronic) | Kidney (Chronic) | Chronic heart failure (HFrEF / HFpEF) leading to progressive chronic kidney disease (CKD) via renal venous hypertension, chronic hypoperfusion, and persistent neurohormonal RAAS activation. |
+| **Type 3** | **Acute Reno-Cardiac** | Kidney (Acute) | Heart (Acute) | Acute kidney injury (ischemia, glomerulonephritis, contrast-induced nephropathy) leading to acute cardiac dysfunction (fluid overload, pulmonary edema, hyperkalemic arrhythmias, uremic pericarditis). |
+| **Type 4** | **Chronic Reno-Cardiac** | Kidney (Chronic) | Heart (Chronic) | Primary chronic kidney disease (CKD stages 1–5D) contributing to left ventricular hypertrophy (LVH), diastolic dysfunction, accelerated coronary calcification, and adverse cardiovascular events. |
+| **Type 5** | **Secondary / Systemic** | Systemic | Both Heart & Kidney | Simultaneous cardiac and renal injury from acute or chronic systemic conditions (septic shock, systemic lupus erythematosus, amyloidosis, vasculitis, diabetes mellitus, severe cirrhosis). |
 
 ---
 
-## 📐 Mathematical Formulation & Logic
+### 2. Hemodynamics: Renal Perfusion Pressure & Venous Congestion
 
-```text
-  fibrosis_risk = "low"
-  fibrosis_risk = "high"
-  fibrosis_risk = "moderate"
-  mortality_risk = "low"
-  mortality_risk = "high"
-```
+$$\text{Renal Perfusion Pressure (RPP)} \approx \text{Mean Arterial Pressure (MAP)} - \text{Central Venous Pressure (CVP)}$$
+
+- In cardiorenal cross-talk, **elevated renal venous pressure (CVP $> 10-12\text{ mmHg}$)** and intra-abdominal hypertension are primary drivers of reduced GFR, often outweighing forward cardiac output reductions.
+- **Decongestion Escalation Protocol:** Loop diuretic optimization $\rightarrow$ thiazide sequential nephron blockade (Metolazone) $\rightarrow$ SGLT2 inhibitor $\rightarrow$ early ultrafiltration if refractory.
 
 ---
 
-## 💻 CLI Quickstart & Usage
+## Features
 
-### 1. Guided Interactive Mode
-```bash
-python cli.py
-```
-
-### 2. Direct Parameterized Evaluation
-```bash
-python cli.py --task-id <value> --target <value> --primary <value> --secondary <value>
-```
-
-### Parameter Reference
-- `--task-id`: Specifies input measurement or parameter value.
-- `--target`: Specifies input measurement or parameter value.
-- `--primary`: Specifies input measurement or parameter value.
-- `--secondary`: Specifies input measurement or parameter value.
-- `--critical`: Specifies input measurement or parameter value.
-- `--status`: Specifies input measurement or parameter value.
-- `--input`: Specifies input measurement or parameter value.
-- `--output`: Specifies input measurement or parameter value.
-
-### Input Data Schema
-
-| Field | Description | Requirement |
-|:------|:------------|:------------|
-| `case_id` | Parameter / observation metric | Required |
-| `patient_synthetic_id` | Parameter / observation metric | Required |
-| `metric_primary` | Parameter / observation metric | Required |
-| `metric_secondary` | Parameter / observation metric | Required |
-| `is_stat` | Parameter / observation metric | Required |
-| `status_flag` | Parameter / observation metric | Required |
+- **ADQI Types 1–5 Classification:** Rigorous differentiation of heart-first vs kidney-first vs systemic syndromes.
+- **Venous Congestion & Decongestion Scoring:** Evaluates CVP, BNP/NT-proBNP, eGFR trajectories, and diuretic response.
+- **Batch CSV Processing:** High-throughput clinical registry processing for ICU and heart failure clinic cohorts.
+- **Standardized Python CLI:** Clean subcommands for audit, batch analysis, and pipeline verification.
 
 ---
 
-## 🛡️ Security & Enterprise Architecture
+## Installation & Requirements
 
-* **Zero-PHI Outbound Interceptor:** Active AST and regex inspection blocking SSNs, MRNs, phone numbers, and patient identifiers.
-* **Tamper-Evident HMAC-SHA256 Audit Trail:** Chained, cryptographically signed logs for every evaluation and state transition.
-* **Air-Gapped LLM Reasoning Adapter:** Agnostic integration for local Ollama instances (`llama3`, `mistral`), Claude 3.5 Sonnet, GPT-4o, and deterministic test mocks.
-* **Active Learning Bayesian Calibration:** Dynamic tracker updating worker reliability weights and monitoring Brier calibration drift.
-* **FastAPI & Prometheus Telemetry:** Exposes OpenAPI 3.1 REST endpoints and operational Prometheus metrics (`/metrics`).
-
----
-
-## 🧪 Testing & Verification
-
-Run the automated test suite:
+- Python 3.10+ (tested on 3.10, 3.11, 3.12)
+- Dependencies: `pytest`, `fastapi`, `pydantic`
 
 ```bash
-pytest -v
-```
-
-Execute high-throughput batch simulation benchmarks:
-
-```bash
-python simulator.py --tasks 1000 --concurrency 8
+git clone https://github.com/abusuraihsakhri/cardiorenal-syndrome-agent.git
+cd cardiorenal-syndrome-agent
+pip install -r requirements.txt  # or pip install fastapi pydantic pytest
 ```
 
 ---
 
-## 🐳 Container Deployment
+## CLI Usage
+
+### 1. Audit Cardiorenal Case
+```bash
+python cli.py audit --task-id TASK_CRS_01 --target PT_HF_AKI --primary 28.5 --secondary 14.2 --critical
+```
+
+### 2. Batch Process Cohorts from CSV
+```bash
+python cli.py batch -i sample.csv -o results.csv
+```
+
+### 3. Verify Cryptographic Audit Trail
+```bash
+python cli.py verify-audit
+```
+
+---
+
+## Testing & Verification
+
+Run the test suite:
 
 ```bash
-docker build -t cardiorenal-syndrome-agent .
-docker run -p 8000:8000 cardiorenal-syndrome-agent
+python -m pytest -p no:zarr
 ```
+
