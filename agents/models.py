@@ -1,12 +1,13 @@
-"""
-Pydantic v2 schemas and data definitions for Cardiorenal Syndrome Agent.
-Domain: Cardiology & Intensive Care Systems
-Standard: AHA/ACC Guidelines / Surviving Sepsis Campaign
-"""
+"""Pydantic models for the retained demonstration audit interface."""
+
 import datetime
 from enum import Enum
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
+
+
+DEMONSTRATION_STANDARD = "Demonstration rule set; not clinical guidance"
 
 
 class UrgencyLevel(str, Enum):
@@ -22,14 +23,24 @@ class SystemIntegrityStatus(str, Enum):
 
 
 class SystemTaskPayload(BaseModel):
-    task_id: str = Field(..., description="Unique task / case identifier")
-    target_identifier: str = Field(..., description="Entity, patient key, or genomic/cryptographic target")
-    primary_metric: float = Field(..., description="Primary domain measurement or score")
-    secondary_metric: float = Field(default=0.0, description="Secondary kinetic or confidence score")
-    status_descriptor: str = Field(default="NOMINAL", description="Status code or phenotype descriptor")
-    is_critical_flag: bool = Field(default=False, description="Emergency escalation or high priority trigger")
-    attributes: Dict[str, Any] = Field(default_factory=dict, description="Metadata key-value pairs")
-    timestamp: str = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+    task_id: str = Field(..., description="Unique task/case identifier")
+    target_identifier: str = Field(
+        ..., description="Synthetic or non-identifying target label"
+    )
+    primary_metric: float = Field(..., description="Demonstration primary metric")
+    secondary_metric: float = Field(
+        default=0.0, description="Demonstration secondary metric"
+    )
+    status_descriptor: str = Field(default="NOMINAL", description="Status descriptor")
+    is_critical_flag: bool = Field(
+        default=False, description="Demonstration priority flag"
+    )
+    attributes: Dict[str, Any] = Field(default_factory=dict)
+    timestamp: str = Field(
+        default_factory=lambda: datetime.datetime.now(
+            datetime.timezone.utc
+        ).isoformat()
+    )
 
 
 class AgentAlert(BaseModel):
@@ -39,8 +50,12 @@ class AgentAlert(BaseModel):
     summary: str
     technical_details: str
     actionable_remediation: str
-    standard_reference: str = "AHA/ACC Guidelines / Surviving Sepsis Campaign"
-    timestamp: str = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+    standard_reference: str = DEMONSTRATION_STANDARD
+    timestamp: str = Field(
+        default_factory=lambda: datetime.datetime.now(
+            datetime.timezone.utc
+        ).isoformat()
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         return self.model_dump()
@@ -49,7 +64,7 @@ class AgentAlert(BaseModel):
 class ConsensusDossier(BaseModel):
     dossier_id: str
     system_slug: str = "cardiorenal-syndrome-agent"
-    domain: str = "Cardiology & Intensive Care Systems"
+    domain: str = "Demonstration threshold audit"
     task_id: str
     target_identifier: str
     overall_urgency: UrgencyLevel
@@ -57,10 +72,14 @@ class ConsensusDossier(BaseModel):
     total_alerts: int
     critical_alerts_count: int
     alerts: List[AgentAlert]
-    standard_reference: str = "AHA/ACC Guidelines / Surviving Sepsis Campaign"
+    standard_reference: str = DEMONSTRATION_STANDARD
     consensus_summary: str
     audit_hash: str
-    timestamp: str = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+    timestamp: str = Field(
+        default_factory=lambda: datetime.datetime.now(
+            datetime.timezone.utc
+        ).isoformat()
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         return self.model_dump()

@@ -1,13 +1,10 @@
-"""
-Live WebSocket Distributed Component Telemetry Streamer for cardiorenal-syndrome-agent.
-"""
+"""Minimal WebSocket event broadcaster retained for compatibility."""
+
 import json
-import asyncio
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 
 class TelemetryBroadcaster:
-    """Broadcasts distributed component reasoning steps in real-time to active WebSocket clients."""
-
     def __init__(self):
         self.active_connections: List[Any] = []
 
@@ -20,11 +17,18 @@ class TelemetryBroadcaster:
             self.active_connections.remove(websocket)
 
     async def broadcast_event(self, event_type: str, data: Dict[str, Any]):
-        msg = json.dumps({"system": "cardiorenal-syndrome-agent", "event_type": event_type, "payload": data})
+        message = json.dumps(
+            {
+                "system": "cardiorenal-syndrome-agent",
+                "event_type": event_type,
+                "payload": data,
+            }
+        )
         for connection in list(self.active_connections):
             try:
-                await connection.send_text(msg)
+                await connection.send_text(message)
             except Exception:
                 self.disconnect(connection)
+
 
 GLOBAL_STREAMER = TelemetryBroadcaster()

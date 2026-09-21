@@ -1,80 +1,82 @@
-# Cardiorenal Syndrome (CRS Types 1–5) & Decongestion Arbiter
+# Cardiorenal Syndrome Agent
 
-A clinically validated clinical decision support platform implementing the **Acute Dialysis Quality Initiative (ADQI / Ronco et al. 2008)** Cardiorenal Syndrome classification (Types 1–5), venous congestion evaluation, diuretic resistance escalation, and hemodynamic cross-talk arbitration.
+Educational and research-oriented reference utilities for the five-type Acute Dialysis Quality Initiative (ADQI) cardiorenal syndrome classification, KDIGO GFR categories, and a simple MAP−CVP pressure-gradient calculation.
 
----
+> **Use limitation:** This repository is not validated clinical decision support. It does not diagnose cardiorenal syndrome, estimate prognosis, or recommend treatment. Do not enter identifiable patient information.
 
-## ADQI Consensus Cardiorenal Syndrome (CRS) Architecture
+## What it includes
 
-Cardiorenal syndrome encompasses bidirectional disorders where acute or chronic dysfunction in one organ induces acute or chronic dysfunction in the other.
+- ADQI cardiorenal syndrome Types 1–5 reference classification.
+- KDIGO GFR categories G1, G2, G3a, G3b, G4, and G5.
+- Optional arithmetic MAP−CVP pressure-gradient calculation.
+- A compact browser interface with light/dark themes; all browser inputs stay local.
+- Python CLI and optional FastAPI interface.
+- Legacy threshold-audit imports retained for compatibility, explicitly labeled as demonstration rules.
+- Tests covering classification boundaries, CSV parsing, audit-chain tamper detection, and browser calculation logic.
 
-### 1. Ronco / ADQI 5-Part Classification Matrix
+The browser application uses plain HTML, CSS, and JavaScript. It does not load Pyodide because the reference calculations are small enough to implement directly in the browser without a Python/WebAssembly runtime.
 
-| CRS Type | Classification | Primary Organ | Secondary Organ | Pathophysiology & Triggers |
-|:---|:---|:---|:---|:---|
-| **Type 1** | **Acute Cardiorenal** | Heart (Acute) | Kidney (Acute) | Acute decompensated heart failure (ADHF), cardiogenic shock, or acute coronary syndrome precipitating acute kidney injury (AKI). Renal hypoperfusion, elevated central venous pressure (CVP). |
-| **Type 2** | **Chronic Cardiorenal** | Heart (Chronic) | Kidney (Chronic) | Chronic heart failure (HFrEF / HFpEF) leading to progressive chronic kidney disease (CKD) via renal venous hypertension, chronic hypoperfusion, and persistent neurohormonal RAAS activation. |
-| **Type 3** | **Acute Reno-Cardiac** | Kidney (Acute) | Heart (Acute) | Acute kidney injury (ischemia, glomerulonephritis, contrast-induced nephropathy) leading to acute cardiac dysfunction (fluid overload, pulmonary edema, hyperkalemic arrhythmias, uremic pericarditis). |
-| **Type 4** | **Chronic Reno-Cardiac** | Kidney (Chronic) | Heart (Chronic) | Primary chronic kidney disease (CKD stages 1–5D) contributing to left ventricular hypertrophy (LVH), diastolic dysfunction, accelerated coronary calcification, and adverse cardiovascular events. |
-| **Type 5** | **Secondary / Systemic** | Systemic | Both Heart & Kidney | Simultaneous cardiac and renal injury from acute or chronic systemic conditions (septic shock, systemic lupus erythematosus, amyloidosis, vasculitis, diabetes mellitus, severe cirrhosis). |
+## Browser use
 
----
+Open `index.html` locally, or use the GitHub Pages deployment after it is enabled and verified. Choose a CRS type, enter an eGFR value, optionally enter both MAP and CVP, and select **Analyze**.
 
-### 2. Hemodynamics: Renal Perfusion Pressure & Venous Congestion
+The GFR category is contextual information only. G1 or G2 alone does not establish CKD, and CKD assessment requires chronicity and/or other markers of kidney damage.
 
-$$\text{Renal Perfusion Pressure (RPP)} \approx \text{Mean Arterial Pressure (MAP)} - \text{Central Venous Pressure (CVP)}$$
+## Python use
 
-- In cardiorenal cross-talk, **elevated renal venous pressure (CVP $> 10-12\text{ mmHg}$)** and intra-abdominal hypertension are primary drivers of reduced GFR, often outweighing forward cardiac output reductions.
-- **Decongestion Escalation Protocol:** Loop diuretic optimization $\rightarrow$ thiazide sequential nephron blockade (Metolazone) $\rightarrow$ SGLT2 inhibitor $\rightarrow$ early ultrafiltration if refractory.
+Requires Python 3.10 or newer.
 
----
-
-## Features
-
-- **ADQI Types 1–5 Classification:** Rigorous differentiation of heart-first vs kidney-first vs systemic syndromes.
-- **Venous Congestion & Decongestion Scoring:** Evaluates CVP, BNP/NT-proBNP, eGFR trajectories, and diuretic response.
-- **Batch CSV Processing:** High-throughput clinical registry processing for ICU and heart failure clinic cohorts.
-- **Standardized Python CLI:** Clean subcommands for audit, batch analysis, and pipeline verification.
-
----
-
-## Installation & Requirements
-
-- Python 3.10+ (tested on 3.10, 3.11, 3.12)
-- Dependencies: `pytest`, `fastapi`, `pydantic`
-
-```bash
+~~~bash
 git clone https://github.com/abusuraihsakhri/cardiorenal-syndrome-agent.git
 cd cardiorenal-syndrome-agent
-pip install -r requirements.txt  # or pip install fastapi pydantic pytest
-```
+python -m pip install -e ".[dev]"
+~~~
 
----
+Reference classification:
 
-## CLI Usage
+~~~bash
+python cli.py classify --crs-type 1 --egfr 55 --map 75 --cvp 12
+~~~
 
-### 1. Audit Cardiorenal Case
-```bash
-python cli.py audit --task-id TASK_CRS_01 --target PT_HF_AKI --primary 28.5 --secondary 14.2 --critical
-```
+Batch compatibility audit:
 
-### 2. Batch Process Cohorts from CSV
-```bash
+~~~bash
 python cli.py batch -i sample.csv -o results.csv
-```
+~~~
 
-### 3. Verify Cryptographic Audit Trail
-```bash
-python cli.py verify-audit
-```
+Optional API:
 
----
+~~~bash
+python -m pip install -e ".[server]"
+python cli.py serve
+~~~
 
-## Testing & Verification
+The compatibility audit uses historical, configurable demonstration thresholds. Its output must not be interpreted as a clinical alert, validated risk score, or treatment recommendation.
 
-Run the test suite:
+## Testing
 
-```bash
-python -m pytest -p no:zarr
-```
+~~~bash
+python -m pip install -e ".[server,dev]"
+python -m pytest
+python -m ruff check . --select E9,F63,F7,F82
+node --check app.js
+node tests/test_app_logic.js
+pip-audit --skip-editable
+~~~
 
+## References
+
+- Ronco C, McCullough P, Anker SD, et al. *Cardio-renal syndromes: report from the consensus conference of the Acute Dialysis Quality Initiative.* Eur Heart J. 2010;31(6):703–711. doi:10.1093/eurheartj/ehp507.
+- KDIGO. *2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease.*
+
+## Privacy and security
+
+The static browser interface performs calculations locally and does not send inputs to a server. The optional Python compatibility layer contains a limited regular-expression identifier screen; it is not a de-identification system and does not establish HIPAA compliance. The in-memory audit chain uses HMAC-SHA256 and a process-random key unless `AUDIT_SECRET_KEY` is explicitly supplied.
+
+## Technology
+
+Python, Pydantic, optional FastAPI/Uvicorn, and dependency-free HTML/CSS/JavaScript. The static interface is intended for current evergreen desktop and mobile browsers.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

@@ -1,12 +1,9 @@
-"""
-Clinical Data Models & Enums for CardioRenal Sentinel: Types 1-5 Cardiorenal & Reno-Cardiac Cross-Talk Arbiter.
-Domain: Nephrology / Cardiology
-Standard: Peer-Reviewed Clinical Guidelines
-"""
+"""Data models used by the compatibility audit interface."""
+
 import datetime
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict
 
 
 class UrgencyLevel(str, Enum):
@@ -32,7 +29,9 @@ class ClinicalCasePayload:
     is_stat: bool = False
     clinical_notes: str = ""
     biomarkers: Dict[str, Any] = field(default_factory=dict)
-    timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+    timestamp: str = field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat()
+    )
 
 
 @dataclass
@@ -43,8 +42,10 @@ class AgentAlert:
     title: str
     clinical_finding: str
     actionable_recommendation: str
-    guideline_citation: str = "Peer-Reviewed Clinical Guidelines"
-    timestamp: str = field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
+    guideline_citation: str = "Demonstration rule set; not clinical guidance"
+    timestamp: str = field(
+        default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         return {

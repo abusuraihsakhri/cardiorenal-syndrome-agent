@@ -1,7 +1,3 @@
-"""
-Cardiorenal Syndrome Agent — Enterprise Automated Analytical Suite.
-Domain: Cardiology & Intensive Care Systems
-Standard: AHA/ACC Guidelines / Surviving Sepsis Campaign
+"""Compatibility package for the demonstration audit interface."""
 
-"""
-__version__ = "3.0.0-ENTERPRISE"
+__version__ = "2.1.0"
