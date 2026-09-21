@@ -1,29 +1,36 @@
-import pytest
-from cardiorenal_sentinel import VenousCongestionScorerAgent, CRSClassificationAgent, DecongestionStrategyAgent, CardioRenalCoordinator, main
+from cardiorenal_sentinel import (
+    CRSClassificationAgent,
+    CardioRenalCoordinator,
+    DecongestionStrategyAgent,
+    DomainKnowledgeRegistry,
+    VenousCongestionScorerAgent,
+    main,
+)
 
 
 def test_sub_agents():
-    a1 = VenousCongestionScorerAgent()
-    alerts1 = a1.evaluate({"metric_primary": 35.0})
-    assert len(alerts1) == 1
-
-    a2 = CRSClassificationAgent()
-    alerts2 = a2.evaluate({"critical_flag": True})
-    assert len(alerts2) == 1
-
-    a3 = DecongestionStrategyAgent()
-    alerts3 = a3.evaluate({"status_text": "DISCORDANT_FINDING"})
-    assert len(alerts3) == 1
+    assert len(VenousCongestionScorerAgent().evaluate({"metric_primary": 35.0})) == 1
+    assert len(CRSClassificationAgent().evaluate({"critical_flag": True})) == 1
+    assert (
+        len(
+            DecongestionStrategyAgent().evaluate(
+                {"status_text": "DISCORDANT_FINDING"}
+            )
+        )
+        == 1
+    )
 
 
 def test_coordinator():
-    coord = CardioRenalCoordinator()
-    dossier = coord.audit_case({"case_id": "TEST-100", "metric_primary": 10.0, "metric_secondary": 2.0})
+    coordinator = CardioRenalCoordinator()
+    dossier = coordinator.audit_case(
+        {"case_id": "TEST-100", "metric_primary": 10.0, "metric_secondary": 2.0}
+    )
     assert dossier["overall_status"] == "CONCORDANT_NORMAL"
     assert dossier["total_alerts"] == 0
 
-    ans = coord.query_assistant("What are the guidelines?")
-    assert "guidelines" in ans or "standards" in ans
+    answer = coordinator.query_assistant("What are the guidelines?")
+    assert "guidelines" in answer.lower() or "standards" in answer.lower()
 
 
 def test_cli():
@@ -31,7 +38,7 @@ def test_cli():
     assert main(["chat", "What", "is", "the", "system", "status?"]) == 0
 
 
-def test_domain_registry():
-    from cardiorenal_sentinel import DomainKnowledgeRegistry
-    assert DomainKnowledgeRegistry.ZERO_PHI_COMPLIANCE is True
-    assert "PRO" in DomainKnowledgeRegistry.SYSTEM_VERSION
+def test_domain_registry_does_not_claim_compliance():
+    assert DomainKnowledgeRegistry.ZERO_PHI_COMPLIANCE is False
+    assert DomainKnowledgeRegistry.SYSTEM_VERSION == "2.1.0"
+    assert DomainKnowledgeRegistry.IDENTIFIER_SCREENING_MODE == "heuristic"

@@ -1,66 +1,77 @@
-"""
-Distributed Component Hierarchy & Executive Coordinator for CardioRenal Sentinel: Types 1-5 Cardiorenal & Reno-Cardiac Cross-Talk Arbiter.
-Domain: Nephrology / Cardiology
-"""
+"""Compatibility audit agents for the demonstration threshold interface."""
+
 import uuid
-from typing import Dict, Any, List, Optional
-from .models import ClinicalCasePayload, AgentAlert, UrgencyLevel, ClinicalIntegrityStatus
+from typing import Any, Dict, List
+
 from .engine import ClinicalDomainEngine
+from .models import (
+    AgentAlert,
+    ClinicalCasePayload,
+    ClinicalIntegrityStatus,
+    UrgencyLevel,
+)
 
 
 class VenousCongestionScorerAgent:
-    """Sub-Agent 1: Primary Metric & Baseline Quality Auditor."""
     def audit(self, case: ClinicalCasePayload) -> List[AgentAlert]:
-        alerts = []
-        res = ClinicalDomainEngine.evaluate_primary_index(case.primary_metric)
-        if res:
-            alerts.append(AgentAlert(
+        result = ClinicalDomainEngine.evaluate_primary_index(case.primary_metric)
+        if not result:
+            return []
+        return [
+            AgentAlert(
                 alert_id=str(uuid.uuid4())[:8],
                 sub_agent="VenousCongestionScorerAgent",
                 urgency=UrgencyLevel.WARNING,
-                title=res["title"],
-                clinical_finding=res["finding"],
-                actionable_recommendation=res["recommendation"],
-            ))
-        return alerts
+                title=result["title"],
+                clinical_finding=result["finding"],
+                actionable_recommendation=result["recommendation"],
+            )
+        ]
 
 
 class CRSClassificationAgent:
-    """Sub-Agent 2: STAT Kinetics & Closed-Loop Escalation Auditor."""
     def audit(self, case: ClinicalCasePayload) -> List[AgentAlert]:
-        alerts = []
-        res = ClinicalDomainEngine.evaluate_secondary_kinetics(case.secondary_metric, case.is_stat)
-        if res:
-            alerts.append(AgentAlert(
+        result = ClinicalDomainEngine.evaluate_secondary_kinetics(
+            case.secondary_metric, case.is_stat
+        )
+        if not result:
+            return []
+        return [
+            AgentAlert(
                 alert_id=str(uuid.uuid4())[:8],
                 sub_agent="CRSClassificationAgent",
-                urgency=UrgencyLevel.STAT_CRITICAL if case.is_stat else UrgencyLevel.WARNING,
-                title=res["title"],
-                clinical_finding=res["finding"],
-                actionable_recommendation=res["recommendation"],
-            ))
-        return alerts
+                urgency=(
+                    UrgencyLevel.STAT_CRITICAL
+                    if case.is_stat
+                    else UrgencyLevel.WARNING
+                ),
+                title=result["title"],
+                clinical_finding=result["finding"],
+                actionable_recommendation=result["recommendation"],
+            )
+        ]
 
 
 class DecongestionStrategyAgent:
-    """Sub-Agent 3: Biomarker & Concordance Triager."""
     def audit(self, case: ClinicalCasePayload) -> List[AgentAlert]:
-        alerts = []
-        res = ClinicalDomainEngine.evaluate_biomarker_concordance(case.status_flag, case.biomarkers)
-        if res:
-            alerts.append(AgentAlert(
+        result = ClinicalDomainEngine.evaluate_biomarker_concordance(
+            case.status_flag, case.biomarkers
+        )
+        if not result:
+            return []
+        return [
+            AgentAlert(
                 alert_id=str(uuid.uuid4())[:8],
                 sub_agent="DecongestionStrategyAgent",
                 urgency=UrgencyLevel.ADVISORY,
-                title=res["title"],
-                clinical_finding=res["finding"],
-                actionable_recommendation=res["recommendation"],
-            ))
-        return alerts
+                title=result["title"],
+                clinical_finding=result["finding"],
+                actionable_recommendation=result["recommendation"],
+            )
+        ]
 
 
 class CardioRenalCoordinator:
-    """Executive Coordinator & Air-Gapped Supervisory Interface."""
     def __init__(self):
         self.agent_1 = VenousCongestionScorerAgent()
         self.agent_2 = CRSClassificationAgent()
@@ -73,38 +84,53 @@ class CardioRenalCoordinator:
         all_alerts.extend(self.agent_2.audit(case))
         all_alerts.extend(self.agent_3.audit(case))
 
-        stat_count = sum(1 for a in all_alerts if a.urgency == UrgencyLevel.STAT_CRITICAL)
-        warn_count = sum(1 for a in all_alerts if a.urgency == UrgencyLevel.WARNING)
+        stat_count = sum(
+            alert.urgency == UrgencyLevel.STAT_CRITICAL for alert in all_alerts
+        )
+        warning_count = sum(
+            alert.urgency == UrgencyLevel.WARNING for alert in all_alerts
+        )
 
-        if stat_count > 0:
+        if stat_count:
             status = ClinicalIntegrityStatus.CRITICAL_ACTION_REQUIRED
-        elif warn_count > 0 or all_alerts:
+        elif all_alerts:
             status = ClinicalIntegrityStatus.DISCORDANCE_DETECTED
         else:
             status = ClinicalIntegrityStatus.CONCORDANT_NORMAL
 
         dossier = {
             "system": "cardiorenal-syndrome-agent",
-            "domain": "Nephrology / Cardiology",
+            "mode": "demonstration-threshold-audit",
             "case_id": case.case_id,
             "patient_synthetic_id": case.patient_synthetic_id,
             "overall_status": status.value,
             "total_alerts": len(all_alerts),
             "stat_critical_alerts": stat_count,
-            "warning_alerts": warn_count,
-            "alerts": [a.to_dict() for a in all_alerts],
-            "guideline_standard": "Peer-Reviewed Clinical Guidelines",
-            "consensus_summary": f"Multi-agent supervision completed across 3 sub-agents with status [{status.value}].",
+            "warning_alerts": warning_count,
+            "alerts": [alert.to_dict() for alert in all_alerts],
+            "guideline_standard": ClinicalDomainEngine.GUIDELINE,
+            "consensus_summary": (
+                f"Demonstration audit completed across 3 rule modules with "
+                f"status [{status.value}]."
+            ),
         }
-
         self.case_registry[case.case_id] = dossier
         return dossier
 
     def query_supervisory_chat(self, user_query: str) -> str:
-        q = user_query.strip().lower()
-        if "status" in q or "summary" in q:
-            return f"CardioRenal Sentinel: Types 1-5 Cardiorenal & Reno-Cardiac Cross-Talk Arbiter currently tracking {len(self.case_registry)} cases in on-premises memory."
-        elif "guideline" in q or "standard" in q:
-            return "Active clinical surveillance operates under Peer-Reviewed Clinical Guidelines validated protocols."
-        else:
-            return f"CardioRenal Sentinel: Types 1-5 Cardiorenal & Reno-Cardiac Cross-Talk Arbiter executive agent online. Zero-PHI air-gapped monitoring active."
+        query = user_query.strip().lower()
+        if "status" in query or "summary" in query:
+            return (
+                f"The local demonstration registry contains "
+                f"{len(self.case_registry)} case record(s)."
+            )
+        if "guideline" in query or "standard" in query:
+            return (
+                "The CRS type reference follows the ADQI five-type classification; "
+                "GFR categories follow KDIGO. The legacy threshold audit is not "
+                "clinical guidance."
+            )
+        return (
+            "This repository provides educational CRS classification utilities and "
+            "a legacy demonstration threshold audit."
+        )
