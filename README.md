@@ -1,5 +1,7 @@
 # Cardiorenal Syndrome Agent
 
+### [Open the Live Application →](https://abusuraihsakhri.github.io/cardiorenal-syndrome-agent/)
+
 Educational and research-oriented reference utilities for the five-type Acute Dialysis Quality Initiative (ADQI) cardiorenal syndrome classification, KDIGO GFR categories, and a simple MAP−CVP pressure-gradient calculation.
 
 > **Use limitation:** This repository is not validated clinical decision support. It does not diagnose cardiorenal syndrome, estimate prognosis, or recommend treatment. Do not enter identifiable patient information.
@@ -18,7 +20,7 @@ The browser application uses plain HTML, CSS, and JavaScript. It does not load P
 
 ## Browser use
 
-Open `index.html` locally, or use the GitHub Pages deployment after it is enabled and verified. Choose a CRS type, enter an eGFR value, optionally enter both MAP and CVP, and select **Analyze**.
+Open `index.html` locally, or use the GitHub Pages application linked above. Choose a CRS type, enter an eGFR value, optionally enter both MAP and CVP, and select **Analyze**.
 
 The GFR category is contextual information only. G1 or G2 alone does not establish CKD, and CKD assessment requires chronicity and/or other markers of kidney damage.
 
